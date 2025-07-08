@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 
-test.skip('has title', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/');
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+// test.skip('has title', async ({ page }) => {
+//   await page.goto('https://www.saucedemo.com/');
+//
+//   Expect a title "to contain" a substring.
+  // await expect(page).toHaveTitle(/Playwright/);
+// });
 
   test('get started link', {tag: ['@smoke']}, async ({ page }) => {
     await page.goto('https://www.saucedemo.com/');
@@ -15,4 +15,10 @@ test.skip('has title', async ({ page }) => {
     await page.waitForTimeout(1000);
     await expect(page.locator('.app_logo', { hasText: 'Swag Labs' })).toBeVisible();
     await page.waitForTimeout(5000);
+    await page.locator('//*[@id="item_4_title_link"]/div').click();
+    await page.waitForTimeout(5000);
+    await expect(page.locator('.inventory_details_desc_container .inventory_details_name', { hasText: 'Sauce Labs Backpack' })).toBeVisible();
+    await expect(page.locator('xpath = //div[@class=\'inventory_details_price\']', { hasText: '29.99' })).toBeVisible();
+
+    await page.pause();
   });
