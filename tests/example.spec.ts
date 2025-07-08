@@ -19,6 +19,10 @@ import { test, expect } from '@playwright/test';
     await page.waitForTimeout(5000);
     await expect(page.locator('.inventory_details_desc_container .inventory_details_name', { hasText: 'Sauce Labs Backpack' })).toBeVisible();
     await expect(page.locator('xpath = //div[@class=\'inventory_details_price\']', { hasText: '29.99' })).toBeVisible();
+    await page.locator('xpath = //button[@name=\'add-to-cart\']').click();
+    const quantityText = await page.locator("//span[@class='shopping_cart_badge']").textContent();
+    const quantity = Number((quantityText ?? '').trim());
+    expect(quantity).toBeGreaterThan(0);
 
     await page.pause();
   });
