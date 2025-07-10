@@ -9,7 +9,7 @@ import {clickFirstXButtonsFromLocator} from "../.github/function";
 // });
 
 const test_data = {
-  countNumber: 3,
+  countNumber: 6,
   numeArticol: 'blabla'
 };
 
