@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {clickFirstXButtonsFromLocator} from "../.github/function";
+import {clickFirstXButtonsFromLocator, clickRemoveXButtonsFromLocator} from "../.github/function";
 
 // test.skip('has title', async ({ page }) => {
 //   await page.goto('https://www.saucedemo.com/');
@@ -9,7 +9,7 @@ import {clickFirstXButtonsFromLocator} from "../.github/function";
 // });
 
 const test_data = {
-  countNumber: 6,
+  countNumber: 3,
   numeArticol: 'blabla'
 };
 
@@ -94,6 +94,33 @@ const test_data = {
     const quantityText = await cartNumber.textContent();
     const quantity = Number((quantityText ?? '').trim());
     expect(quantity).toStrictEqual(test_data.countNumber);
+    await page.waitForTimeout(5000);
+
+    //remove the items from the cart
+    const locatorRemove = page.locator('.btn.btn_secondary.btn_small.btn_inventory');
+    await clickRemoveXButtonsFromLocator(locatorRemove, test_data.countNumber);
+    await page.waitForTimeout(5000);
+
+
+    //add items with total of 30$
+    const products = await page.$$('.product');
+    let total = 0;
+
+    for (const product of products) {
+      const priceText = await product.$eval('.price', el => el.textContent);
+      const price = parseFloat(priceText.replace('$', '').trim());
+
+      if (total + price <= 30) {
+        const addButton = await product.$('.add-to-cart');
+        if (addButton) {
+          await addButton.click();
+          total += price;
+          console.log(`Adăugat produs de $${price}. Total: $${total}`);
+        }
+      }
+      if (total >= 30) break;
+    }
+
 
     await page.pause();
   });
