@@ -7,6 +7,14 @@ test.beforeEach(async ({ browser }) => {    page = await browser.newPage();
     await expect(page.locator('.app_logo', { hasText: 'Practice Form' })).toBeVisible();
     await page.waitForTimeout(1000);
 
-    // await page.getByPlaceholder('Username').fill('standard_user');
-    // await page.getByRole('textbox', {name: 'password'}).fill('secret_sauce');
+test('Fill first name, last name and email', { tag: ['@withHooks'] },async ({  }) => {
+    await page.getByPlaceholder('First Name').fill('Ana');
+    await page.getByPlaceholder('Last Name').fill('Banana');
+    await page.getByPlaceholder('name@example.com').fill('anabanana@gmail.com');
+    });
+
+test('Select the gender', { tag: ['@withHooks'] },async ({  }) => {
+        await page.locator('//label[text()="Female"]').click();    // Expect a title "to contain" a substring.
+    });
+
 });
