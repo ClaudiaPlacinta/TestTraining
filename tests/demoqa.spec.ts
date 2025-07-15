@@ -34,3 +34,19 @@ test('Fill mobile number and check the number', {tag: ['@withHooks']}, async ({}
     // Așteptare logică pentru test
     expect(isValidPhone).toBe(true);
 });
+
+test('Fill mobile number wrong and check the number', {tag: ['@withHooks']}, async ({}) => {
+    await page.getByPlaceholder('Mobile Number').fill('0756345');
+    const phoneInput = await page.getByPlaceholder('Mobile Number'); // înlocuiește cu selectorul real
+    await expect(phoneInput).toBeVisible();
+    const phoneValue = await phoneInput.inputValue();
+
+    // Verifică dacă este un număr format exact din 10 cifre
+    const isValidPhone = /^\d{10}$/.test(phoneValue);
+
+    // Afișează rezultatul
+    console.log(`Numărul de telefon este ${isValidPhone ? 'valid' : 'invalid'}`);
+
+    // Așteptare logică pentru test
+    expect(isValidPhone).toBe(false);
+});
