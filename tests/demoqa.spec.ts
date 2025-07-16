@@ -1,4 +1,6 @@
 import {expect, test} from '@playwright/test';
+import * as path from "node:path";
+import * as fs from "node:fs";
 
 let page;
 
@@ -50,3 +52,63 @@ test('Fill mobile number wrong and check the number', {tag: ['@withHooks']}, asy
     // Așteptare logică pentru test
     expect(isValidPhone).toBe(false);
 });
+
+test('Date of birth input', {tag: ['@withHooks']}, async ({}) => {
+    const dataNasterii = '15 05 1990'; // format ISO
+    const dateInput = page.locator('#dateOfBirthInput'); // înlocuiește cu selectorul real
+
+    await dateInput.fill(dataNasterii); // introduce direct data
+    await expect(dateInput).toHaveValue(dataNasterii); // validare
+});
+
+test('Fill the subject', {tag: ['@withHooks']}, async ({}) => {
+    await page.locator('.subjects-auto-complete__value-container').fill('Subject');
+});
+
+test('Click the hobbies checkboxes', {tag: ['@withHooks']}, async ({}) => {
+    await page.locator('xpath= (//label[@class=\'custom-control-label\'])[4]').click();
+    await page.locator('xpath= (//label[@class=\'custom-control-label\'])[5]').click();
+    await page.locator('xpath= (//label[@class=\'custom-control-label\'])[6]').click();
+});
+
+test('Select a picture', {tag: ['@withHooks']}, async ({}) => {
+    // await page.locator('.form-control-file').click();
+    const imagePath = path.resolve(__dirname, '../assets/bunny.jpg.jpg');
+
+    // Verificăm că fișierul există (opțional, dar util)
+    if (!fs.existsSync(imagePath)) {
+        throw new Error(`Fișierul nu a fost găsit la: ${imagePath}`);
+    }
+
+    // Selectăm inputul de fișier și încărcăm imaginea
+    const fileInput = page.locator('#uploadPicture');
+    await fileInput.setInputFiles(imagePath);
+
+    // Verificăm că numele fișierului a fost introdus
+    const fileName = await fileInput.evaluate(input => input.files?.[0]?.name);
+    expect(fileName).toBe('bunny.jpg.jpg');
+});
+
+test('Fill the address, state and city', {tag: ['@withHooks']}, async ({}) => {
+    // 1. Completează "Current Address"
+    await page.getByPlaceholder('Current Address').fill('Strada Florilor, nr. 4, Cluj');
+
+    // 2. Selectează State (ex: NCR)
+    // await page.locator('xpath= (//div[@class=\' css-tlfecz-indicatorContainer\'])[1]').click(); // deschide dropdownul
+    // await page.locator('.css-26l3qy-menu div:has-text("NCR")').nth(0).click();
+    //
+    // // 3. Selectează City (ex: Delhi, valabil doar dacă ai ales NCR)
+    // await page.locator('xpath= (//div[@class=\' css-tlfecz-indicatorContainer\'])[2]').click(); // deschide dropdownul
+    // await page.locator('.css-26l3qy-menu div:has-text("Delhi")').nth(0).click();
+
+    await page.locator('xpath= (//div[@class=\' css-tlfecz-indicatorContainer\'])[1]').click();
+    await page.getByText('NCR', { exact: true }).click();
+
+    await page.locator('#city').click();
+    await page.getByText('Delhi', { exact: true }).click();
+
+    // (Opțional) Verificări
+    await expect(page.locator('#currentAddress')).toHaveValue(/Cluj/);
+    await expect(page.locator('#state')).toContainText('NCR');
+    await expect(page.locator('#city')).toContainText('Delhi');
+    });
