@@ -38,3 +38,35 @@ test.skip('Has sauce in the name', { tag: ['@withHooks'] }, async ({  }) => {
         }
     }
 });
+
+test('Sum of items from the cart is 30', { tag: ['@withHooks'] }, async ({  }) => {
+    const productCards = page.locator('.inventory_item');
+    const count = await productCards.count();
+
+    let total = 0;
+
+    for (let i = 0; i < count; i++) {
+        const product = productCards.nth(i);
+
+        const priceText = await product.locator('.inventory_item_price').innerText(); // ex: "$9.99"
+        const price = parseFloat(priceText.replace('$', ''));
+
+        if (total + price <= 30) {
+            // Click pe butonul "Add to cart"
+            await product.locator('button:has-text("Add to cart")').click();
+            total += price;
+            console.log(`Adăugat: ${priceText} (total: $${total.toFixed(2)})`);
+        } else {
+            console.log(`Sare peste: ${priceText} (totalul ar depăși 30$)`);
+        }
+    }
+
+    console.log(`Total în coș: $${total.toFixed(2)}`);
+
+    // 4. Verificare: numărul de produse adăugate în coș
+    const cartBadge = page.locator('.shopping_cart_badge');
+    const cartCount = parseInt(await cartBadge.textContent() || '0');
+    console.log(`Produse în coș: ${cartCount}`);
+
+    expect(total).toBeLessThanOrEqual(30);
+});

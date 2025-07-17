@@ -62,7 +62,8 @@ test('Date of birth input', {tag: ['@withHooks']}, async ({}) => {
 });
 
 test('Fill the subject', {tag: ['@withHooks']}, async ({}) => {
-    await page.locator('.subjects-auto-complete__value-container').fill('Subject');
+    const inputSubject = page.locator('#subjectsInput');
+    await inputSubject.fill('Subject test');
 });
 
 test('Click the hobbies checkboxes', {tag: ['@withHooks']}, async ({}) => {
