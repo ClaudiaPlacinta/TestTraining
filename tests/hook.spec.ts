@@ -39,34 +39,35 @@ test.skip('Has sauce in the name', { tag: ['@withHooks'] }, async ({  }) => {
     }
 });
 
-test('Sum of items from the cart is 30', { tag: ['@withHooks'] }, async ({  }) => {
+test('Sum of items from the cart is less than 30', { tag: ['@withHooks'] }, async ({  }) => {
     const productCards = page.locator('.inventory_item');
-    const count = await productCards.count();
+    const productCount = await productCards.count();
 
     let total = 0;
+    let addedProducts: string[] = [];
 
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < productCount; i++) {
         const product = productCards.nth(i);
-
-        const priceText = await product.locator('.inventory_item_price').innerText(); // ex: "$9.99"
+        const priceText = await product.locator('.inventory_item_price').innerText(); // ex: "$7.99"
+        const title = await product.locator('.inventory_item_name').innerText();
         const price = parseFloat(priceText.replace('$', ''));
 
         if (total + price <= 30) {
-            // Click pe butonul "Add to cart"
+            // Adaugă în coș
             await product.locator('button:has-text("Add to cart")').click();
             total += price;
-            console.log(`Adăugat: ${priceText} (total: $${total.toFixed(2)})`);
-        } else {
-            console.log(`Sare peste: ${priceText} (totalul ar depăși 30$)`);
+            addedProducts.push(`${title} - $${price.toFixed(2)}`);
         }
     }
 
+    // 3. Afișează produsele adăugate și totalul
+    console.log('Produse adăugate în coș:');
+    addedProducts.forEach(item => console.log(' - ' + item));
     console.log(`Total în coș: $${total.toFixed(2)}`);
 
-    // 4. Verificare: numărul de produse adăugate în coș
+    // 4. Verificare: badge-ul de coș reflectă numărul de produse
     const cartBadge = page.locator('.shopping_cart_badge');
     const cartCount = parseInt(await cartBadge.textContent() || '0');
-    console.log(`Produse în coș: ${cartCount}`);
-
+    expect(cartCount).toBe(addedProducts.length);
     expect(total).toBeLessThanOrEqual(30);
 });
